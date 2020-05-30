@@ -1,4 +1,10 @@
-.main-view h1 {
+.header h1.logo {
+    font-size: 1em;
+    margin: var(--lumo-space-m);
+}
+
+
+.main-view H1 {
     width: 100%;
     margin: 0;
     padding: 20px;
