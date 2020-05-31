@@ -1,5 +1,6 @@
 package com.gmail.emmanuel.UI;
 
+import com.gmail.emmanuel.Application;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -8,6 +9,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Header;
+import com.vaadin.flow.component.html.Main;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -62,6 +64,10 @@ public class MainView extends VerticalLayout {
             MainLayout a = new MainLayout();
             add(a);
         });
+    }
+
+    public static String getUser() {
+        return user;
     }
 
     static String user;

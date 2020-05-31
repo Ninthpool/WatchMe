@@ -1,4 +1,4 @@
-.header h1.logo {
+.header H1 {
     font-size: 1em;
     margin: var(--lumo-space-m);
 }
@@ -8,4 +8,9 @@
     width: 100%;
     margin: 0;
     padding: 20px;
+}
+
+.message-list {
+    overflow-y: scroll;
+    width: 100%;
 }
