@@ -1,0 +1,463 @@
+
+<!doctype html><html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><base href="."><meta name="viewport" content="width=device-width, initial-scale=1.0"><style type="text/css">body {height:100vh;width:100%;margin:0;}.v-reconnect-dialog, .v-system-error {position: absolute;color: black;background: white;top: 1em;right: 1em;border: 1px solid black;padding: 1em;z-index: 10000;max-width: calc(100vw - 4em);max-height: calc(100vh - 4em);overflow: auto;} .v-system-error {color: red;pointer-events: auto;}</style><script type="text/javascript" src="./VAADIN/build/webcomponentsjs/webcomponents-loader.js"></script><script type="module" src="./VAADIN/build/vaadin-bundle-0f4606ccd6ea51ac768d.cache.js" data-app-id="ROOT" crossorigin></script><script type="text/javascript">//<![CDATA[
+(function() {  var apps = {};  var log;  if (typeof console === undefined || !window.location.search.match(/[&?]debug(&|$)/)) {    /* If no console.log present, just use a no-op */    log = function() {};  } else if (typeof console.log === "function") {    /* If it's a function, use it with apply */    log = function() {      console.log.apply(console, arguments);    };  } else {    /* In IE, its a native function for which apply is not defined, but it works     without a proper 'this' reference */    log = console.log;  }    var isInitializedInDom = function(appId) {    var appDiv = document.getElementById(appId);    if (!appDiv) {      return false;    }    for ( var i = 0; i < appDiv.childElementCount; i++) {      var className = appDiv.childNodes[i].className;      /* If the app div contains a child with the class      "v-app-loading" we have only received the HTML      but not yet started the widget set      (UIConnector removes the v-app-loading div). */      if (className && className.indexOf("v-app-loading") != -1) {        return false;      }    }    return true;  };    /*    * Needed for Testbench compatibility, but prevents any Vaadin 7 app from   * bootstrapping unless the legacy vaadinBootstrap.js file is loaded before   * this script.   */  window.Vaadin = window.Vaadin || {};  window.Vaadin.Flow = window.Vaadin.Flow || {};  /*   * Needed for wrapping custom javascript functionality in the components (i.e. connectors)   */  window.Vaadin.Flow.tryCatchWrapper = function(originalFunction, component, repo) {    return function() {      try {        const result = originalFunction.apply(this, arguments);        return result;      } catch (error) {        console.error(            "There seems to be an error in the " + component + ":\n" + error.message + "\n"              + "Please submit an issue to https://github.com/vaadin/" + repo              + "/issues/new!");      }    }  };  if (!window.Vaadin.Flow.clients) {    window.Vaadin.Flow.clients = {};    window.Vaadin.Flow.pendingStartup = {};    window.Vaadin.Flow.initApplication = function(appId, config) {      var testbenchId = appId.replace(/-\d+$/, '');            if (apps[appId]) {        if (window.Vaadin && window.Vaadin.Flow && window.Vaadin.Flow.clients && window.Vaadin.Flow.clients[testbenchId] && window.Vaadin.Flow.clients[testbenchId].initializing) {          throw "Application " + appId + " is already being initialized";        }        if (isInitializedInDom(appId)) {          throw "Application " + appId + " already initialized";        }      }        log("init application", appId, config);            window.Vaadin.Flow.clients[testbenchId] = {          isActive: function() {            return true;          },          initializing: true,          productionMode: mode      };            var getConfig = function(name) {        var value = config[name];        return value;      };            /* Export public data */      var app = {        getConfig: getConfig      };      apps[appId] = app;            if (!window.name) {        window.name =  appId + '-' + Math.random();      }        var widgetset = "client";      if (!window.Vaadin.Flow.pendingStartup[widgetset]) {        window.Vaadin.Flow.pendingStartup[widgetset] = {          pendingApps: []        };      }      if (window.Vaadin.Flow.pendingStartup[widgetset].callback) {        log("Starting from bootstrap", appId);        window.Vaadin.Flow.pendingStartup[widgetset].callback(appId);      } else {        log("Setting pending startup", appId);        window.Vaadin.Flow.pendingStartup[widgetset].pendingApps.push(appId);      }      return app;    };    window.Vaadin.Flow.getAppIds = function() {      var ids = [ ];      for (var id in apps) {        if (apps.hasOwnProperty(id)) {          ids.push(id);        }      }      return ids;    };    window.Vaadin.Flow.getApp = function(appId) {      return apps[appId];    };    window.Vaadin.Flow.registerWidgetset = function(widgetset, callback) {      log("Widgetset registered", widgetset);      if (!window.Vaadin.Flow.pendingStartup[widgetset]) {        window.Vaadin.Flow.pendingStartup[widgetset] = {          pendingApps: [],          callback: callback        };        /* Callback will be invoked when initApp is called */        return;      }      var ws = window.Vaadin.Flow.pendingStartup[widgetset];      if (ws.pendingApps) {        ws.callback = callback;        for (var i = 0; i < ws.pendingApps.length; i++) {          var appId = ws.pendingApps[i];          log("Starting from register widgetset", appId);          callback(appId);        }        ws.pendingApps = null;      }    };    window.Vaadin.Flow.getBrowserDetailsParameters = function() {      var params = {  };      /* Screen height and width */      params['v-sh'] = window.screen.height;      params['v-sw'] = window.screen.width;      /* Browser window dimensions */      params['v-wh'] = window.innerHeight;      params['v-ww'] = window.innerWidth;      /* Body element dimensions */      params['v-bh'] = document.body.clientHeight;      params['v-bw'] = document.body.clientWidth;      /* Current time */      var date = new Date();      params['v-curdate'] = date.getTime();      /* Current timezone offset (including DST shift) */      var tzo1 = date.getTimezoneOffset();      /* Compare the current tz offset with the first offset from the end         of the year that differs --- if less that, we are in DST, otherwise         we are in normal time */      var dstDiff = 0;      var rawTzo = tzo1;      for(var m = 12; m > 0; m--) {        date.setUTCMonth(m);        var tzo2 = date.getTimezoneOffset();        if (tzo1 != tzo2) {          dstDiff = (tzo1 > tzo2 ? tzo1 - tzo2 : tzo2 - tzo1);          rawTzo = (tzo1 > tzo2 ? tzo1 : tzo2);          break;        }      }      /* Time zone offset */      params['v-tzo'] = tzo1;      /* DST difference */      params['v-dstd'] = dstDiff;      /* Time zone offset without DST */      params['v-rtzo'] = rawTzo;      /* DST in effect? */      params['v-dston'] = (tzo1 != rawTzo);      /* Time zone id (if available) */      try {        params['v-tzid'] = Intl.DateTimeFormat().resolvedOptions().timeZone;      } catch (err) {        params['v-tzid'] = '';      }      /* Window name */      if (window.name) {        params['v-wn'] = window.name;      }      /* Detect touch device support */      var supportsTouch = false;      try {        document.createEvent("TouchEvent");        supportsTouch = true;      } catch (e) {        /* Chrome and IE10 touch detection */        supportsTouch = 'ontouchstart' in window          || (typeof navigator.msMaxTouchPoints !== 'undefined');      }      params['v-td'] = supportsTouch;      /* Device Pixel Ratio */      params['v-pr'] = window.devicePixelRatio;      if(navigator.platform) {        params['v-np'] = navigator.platform;      }            /* Stringify each value (they are parsed on the server side) */      Object.keys(params).forEach(function(key) {        var value = params[key];        if (typeof value !== 'undefined') {          params[key] = value.toString();        }      });      return params;    };  }    log('Flow bootstrap loaded');    if (typeof window.__gwtStatsEvent != 'function') {window.Vaadin.Flow.gwtStatsEvents = [];window.__gwtStatsEvent = function(event) {window.Vaadin.Flow.gwtStatsEvents.push(event); return true;};};    var uidl = {
+    "syncId": 0,
+    "clientId": 0,
+    "constants": {
+        "OSoHnU3SjNg=": {
+            "event.shiftKey": false,
+            "event.metaKey": false,
+            "event.code": false,
+            "event.key": false,
+            "event.isComposing": false,
+            "(['Enter'].indexOf(event.code) !== -1 || ['Enter'].indexOf(event.key) !== -1) && !event.getModifierState('Shift') && !event.getModifierState('Control') && !event.getModifierState('Alt') && !event.getModifierState('AltGraph') && !event.getModifierState('Meta') && (event.stopPropagation() || true)": true,
+            "event.ctrlKey": false,
+            "event.repeat": false,
+            "event.location": false,
+            "event.altKey": false
+        },
+        "F8oCtNArLiI=": {
+            "event.shiftKey": false,
+            "event.metaKey": false,
+            "event.detail": false,
+            "event.ctrlKey": false,
+            "event.clientX": false,
+            "event.clientY": false,
+            "event.altKey": false,
+            "event.button": false,
+            "event.screenY": false,
+            "event.screenX": false
+        },
+        "Fg73o1qebBo=": {
+            "}value": false
+        }
+    },
+    "changes": [
+        {
+            "node": 1,
+            "type": "put",
+            "key": "tag",
+            "feat": 0,
+            "value": "body"
+        },
+        {
+            "node": 1,
+            "type": "splice",
+            "feat": 2,
+            "index": 0,
+            "addNodes": [
+                10
+            ]
+        },
+        {
+            "node": 1,
+            "type": "put",
+            "key": "keydown",
+            "feat": 4,
+            "value": "OSoHnU3SjNg="
+        },
+        {
+            "node": 1,
+            "type": "put",
+            "key": "pushUrl",
+            "feat": 5,
+            "value": "context://vaadinServlet/"
+        },
+        {
+            "node": 1,
+            "type": "put",
+            "key": "alwaysXhrToServer",
+            "feat": 5,
+            "value": true
+        },
+        {
+            "node": 1,
+            "type": "put",
+            "key": "pushMode",
+            "feat": 5,
+            "value": "DISABLED"
+        },
+        {
+            "node": 1,
+            "type": "put",
+            "key": "parameters",
+            "feat": 5,
+            "nodeValue": 2
+        },
+        {
+            "node": 2,
+            "type": "attach"
+        },
+        {
+            "node": 2,
+            "type": "put",
+            "key": "fallbackTransport",
+            "feat": 6,
+            "value": "long-polling"
+        },
+        {
+            "node": 2,
+            "type": "put",
+            "key": "transport",
+            "feat": 6,
+            "value": "websocket"
+        },
+        {
+            "node": 3,
+            "type": "attach"
+        },
+        {
+            "node": 3,
+            "type": "put",
+            "key": "text",
+            "feat": 7,
+            "value": "Enter the Room"
+        },
+        {
+            "node": 4,
+            "type": "attach"
+        },
+        {
+            "node": 4,
+            "type": "put",
+            "key": "tag",
+            "feat": 0,
+            "value": "vaadin-button"
+        },
+        {
+            "node": 4,
+            "type": "clear",
+            "feat": 2
+        },
+        {
+            "node": 4,
+            "type": "splice",
+            "feat": 2,
+            "index": 0,
+            "addNodes": [
+                3
+            ]
+        },
+        {
+            "node": 4,
+            "type": "put",
+            "key": "theme",
+            "feat": 3,
+            "value": "primary"
+        },
+        {
+            "node": 4,
+            "type": "put",
+            "key": "click",
+            "feat": 4,
+            "value": "F8oCtNArLiI="
+        },
+        {
+            "node": 5,
+            "type": "attach"
+        },
+        {
+            "node": 5,
+            "type": "put",
+            "key": "tag",
+            "feat": 0,
+            "value": "vaadin-text-field"
+        },
+        {
+            "node": 5,
+            "type": "put",
+            "key": "invalid",
+            "feat": 1,
+            "value": false
+        },
+        {
+            "node": 5,
+            "type": "put",
+            "key": "label",
+            "feat": 1,
+            "value": "Room Number"
+        },
+        {
+            "node": 5,
+            "type": "put",
+            "key": "value",
+            "feat": 1,
+            "value": ""
+        },
+        {
+            "node": 5,
+            "type": "put",
+            "key": "change",
+            "feat": 4,
+            "value": "Fg73o1qebBo="
+        },
+        {
+            "node": 6,
+            "type": "attach"
+        },
+        {
+            "node": 6,
+            "type": "put",
+            "key": "tag",
+            "feat": 0,
+            "value": "vaadin-text-field"
+        },
+        {
+            "node": 6,
+            "type": "put",
+            "key": "invalid",
+            "feat": 1,
+            "value": false
+        },
+        {
+            "node": 6,
+            "type": "put",
+            "key": "label",
+            "feat": 1,
+            "value": "Your name"
+        },
+        {
+            "node": 6,
+            "type": "put",
+            "key": "value",
+            "feat": 1,
+            "value": ""
+        },
+        {
+            "node": 6,
+            "type": "put",
+            "key": "change",
+            "feat": 4,
+            "value": "Fg73o1qebBo="
+        },
+        {
+            "node": 7,
+            "type": "attach"
+        },
+        {
+            "node": 7,
+            "type": "put",
+            "key": "tag",
+            "feat": 0,
+            "value": "vaadin-vertical-layout"
+        },
+        {
+            "node": 7,
+            "type": "splice",
+            "feat": 2,
+            "index": 0,
+            "addNodes": [
+                6,
+                5,
+                4
+            ]
+        },
+        {
+            "node": 7,
+            "type": "put",
+            "key": "theme",
+            "feat": 3,
+            "value": "padding spacing"
+        },
+        {
+            "node": 7,
+            "type": "put",
+            "key": "width",
+            "feat": 12,
+            "value": "100%"
+        },
+        {
+            "node": 7,
+            "type": "put",
+            "key": "align-items",
+            "feat": 12,
+            "value": "center"
+        },
+        {
+            "node": 8,
+            "type": "attach"
+        },
+        {
+            "node": 8,
+            "type": "put",
+            "key": "text",
+            "feat": 7,
+            "value": "WatchMe"
+        },
+        {
+            "node": 9,
+            "type": "attach"
+        },
+        {
+            "node": 9,
+            "type": "put",
+            "key": "tag",
+            "feat": 0,
+            "value": "h1"
+        },
+        {
+            "node": 9,
+            "type": "clear",
+            "feat": 2
+        },
+        {
+            "node": 9,
+            "type": "splice",
+            "feat": 2,
+            "index": 0,
+            "addNodes": [
+                8
+            ]
+        },
+        {
+            "node": 9,
+            "type": "put",
+            "key": "theme",
+            "feat": 3,
+            "value": "dark"
+        },
+        {
+            "node": 10,
+            "type": "attach"
+        },
+        {
+            "node": 10,
+            "type": "put",
+            "key": "tag",
+            "feat": 0,
+            "value": "vaadin-vertical-layout"
+        },
+        {
+            "node": 10,
+            "type": "splice",
+            "feat": 2,
+            "index": 0,
+            "addNodes": [
+                9,
+                7
+            ]
+        },
+        {
+            "node": 10,
+            "type": "splice",
+            "feat": 11,
+            "index": 0,
+            "add": [
+                "main-view"
+            ]
+        },
+        {
+            "node": 10,
+            "type": "put",
+            "key": "theme",
+            "feat": 3,
+            "value": "padding spacing"
+        },
+        {
+            "node": 10,
+            "type": "put",
+            "key": "width",
+            "feat": 12,
+            "value": "100%"
+        }
+    ],
+    "execute": [
+        [
+            [
+                0,
+                5
+            ],
+            [
+                2,
+                5,
+                0
+            ],
+            [
+                2,
+                5,
+                1
+            ],
+            "try{Promise.resolve((function(){return (function() { this.validate = function () {return this.checkValidity();}}).apply($0)})()).then($1,function(error){$2(''+error)})}catch(error){$2(''+error)}"
+        ],
+        [
+            [
+                0,
+                5
+            ],
+            [
+                2,
+                5,
+                2
+            ],
+            [
+                2,
+                5,
+                3
+            ],
+            "try{Promise.resolve((function(){return (function() { this.validate = function () {return this.checkValidity();}}).apply($0)})()).then($1,function(error){$2(''+error)})}catch(error){$2(''+error)}"
+        ],
+        [
+            [
+                0,
+                6
+            ],
+            [
+                2,
+                6,
+                0
+            ],
+            [
+                2,
+                6,
+                1
+            ],
+            "try{Promise.resolve((function(){return (function() { this.validate = function () {return this.checkValidity();}}).apply($0)})()).then($1,function(error){$2(''+error)})}catch(error){$2(''+error)}"
+        ],
+        [
+            [
+                0,
+                6
+            ],
+            [
+                2,
+                6,
+                2
+            ],
+            [
+                2,
+                6,
+                3
+            ],
+            "try{Promise.resolve((function(){return (function() { this.validate = function () {return this.checkValidity();}}).apply($0)})()).then($1,function(error){$2(''+error)})}catch(error){$2(''+error)}"
+        ]
+    ],
+    "timings": [
+        918,
+        1
+    ],
+    "Vaadin-Security-Key": "c1b7e31a-c678-4e07-8340-a6650cd648f9",
+    "Vaadin-Push-ID": "4a12a0df-0fa4-473f-aa34-559d94e36770"
+};  var config = {
+    "frontendUrlEs6": "context://frontend/",
+    "frontendUrlEs5": "context://frontend/",
+    "versionInfo": {
+        "vaadinVersion": "2.2.0",
+        "atmosphereVersion": "2.4.30.slf4jvaadin1"
+    },
+    "sessExpMsg": {
+        "caption": null,
+        "message": null,
+        "url": null
+    },
+    "contextRootUrl": "./",
+    "debug": true,
+    "requestTiming": true,
+    "heartbeatInterval": 300,
+    "maxMessageSuspendTimeout": 5000,
+    "v-uiId": 8
+};  var mode = false;  config.uidl = uidl;  window.Vaadin.Flow.initApplication("ROOT-2521314", config);})();//]]></script><script type="text/javascript" defer src="./VAADIN/static/client/client-4AE3B7490A0EC7EE13B41C91E0150FBA.cache.js"></script><meta name="apple-mobile-web-app-capable" content="yes"><meta name="theme-color" content="#ffffff"><meta name="apple-mobile-web-app-status-bar-style" content="#ffffff"><link rel="manifest" href="manifest.webmanifest"><link sizes="16x16" rel="shortcut icon" href="icons/icon-16x16.png" type="image/png"><link sizes="32x32" rel="icon" href="icons/icon-32x32.png?-208588914" type="image/png"><link sizes="96x96" rel="icon" href="icons/icon-96x96.png?77655646" type="image/png"><link sizes="180x180" rel="apple-touch-icon" href="icons/icon-180x180.png?1716211545" type="image/png"><link sizes="1125x2436" rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" href="icons/icon-1125x2436.png?-1314043752" type="image/png"><link sizes="750x1334" rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="icons/icon-750x1334.png?1309677097" type="image/png"><link sizes="1242x2208" rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 763px) and (-webkit-device-pixel-ratio: 3)" href="icons/icon-1242x2208.png?663464508" type="image/png"><link sizes="640x1136" rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" href="icons/icon-640x1136.png?123676538" type="image/png"><script>if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('sw.js');
+  });
+}</script></head><body><noscript>You have to enable javascript in your browser to use this web site.</noscript><script>window.Vaadin.registrations = window.Vaadin.registrations || [];
+window.Vaadin.registrations.push({"is":"flow/SpringInstantiator","version":"2.2.0"},{"is":"flow/AtmospherePushConnection","version":"2.4.30.slf4jvaadin1"},{"is":"java","version":"12.0.2"},{"is":"flow/npm","version":"2.2.0"});</script></body></html>
