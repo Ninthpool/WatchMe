@@ -28,7 +28,7 @@ import reactor.core.publisher.UnicastProcessor;
 import java.awt.*;
 //import java.util.concurrent.SubmissionPublisher;
 
-@Route(value = "Chat", layout = MainLayout.class) 
+@Route(value = "Chat", layout = MainLayout.class)
 @PageTitle("Chat | Menu")
 public class ChatView extends VerticalLayout {
 
@@ -48,8 +48,10 @@ public class ChatView extends VerticalLayout {
     private void startChat() {
         MessageList messageList = new MessageList();
         VerticalLayout v = new VerticalLayout();
+        messageList.setMaxHeight(messageList.getMaxHeight());
+        messageList.setMaxWidth(messageList.getMaxWidth());
         v.add(messageList, createInputLayout());
-        expand(messageList);
+
         add(v);
 
 

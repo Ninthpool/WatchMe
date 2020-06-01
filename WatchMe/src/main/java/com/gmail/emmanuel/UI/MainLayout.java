@@ -13,6 +13,7 @@ import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
+//import jdk.internal.org.jline.utils.ShutdownHooks;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.UnicastProcessor;
 
@@ -41,10 +42,12 @@ public class MainLayout extends AppLayout {
 
     private void createDrawer() {
         RouterLink ChatLink = new RouterLink("Chat", ChatView.class);
+        RouterLink TaskLink = new RouterLink("Task", TaskView.class);
         ChatLink.setHighlightCondition(HighlightConditions.sameLocation());
-
+        TaskLink.setHighlightCondition(HighlightConditions.sameLocation());
         addToDrawer(new VerticalLayout(
-                ChatLink
+                ChatLink,
+                TaskLink
         ));
     }
 
